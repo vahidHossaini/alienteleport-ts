@@ -5,7 +5,7 @@ npm install
 
 Build
 ```sh
-npm install 
+npm run build 
 ``` 
 
 Start
