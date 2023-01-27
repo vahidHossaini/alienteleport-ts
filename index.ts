@@ -110,6 +110,9 @@ export default class AlienTeleportTs
         let log:any={};
         for(let transaction of block.transactions)
         {
+            console.log('>>>>>>',config.hyperionUrl+'/v1/history/get_transaction');
+            console.log('>>>>>>',{id:transaction.trx.id});
+            
             let trx:any=  await WebService.post(config.hyperionUrl+'/v1/history/get_transaction',{id:transaction.trx.id},null,null)
             log=trx.traces.filter(p=>p.act.name=='logteleport' && p.act.account==config.contract)[0]
             if(log) break
