@@ -105,6 +105,10 @@ export default class AlienTeleportTs
     {
          
         console.log(model.data.quantity);
+        try{
+            if(model.data.quantity.split(' ')[1]!=config.symbol)return;
+            
+        }catch(exp){}
         let block:any= await WebService.post(config.hyperionUrl+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
         console.log(block.transactions);
         let log:any={};
