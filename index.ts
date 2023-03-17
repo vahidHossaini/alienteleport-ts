@@ -103,8 +103,6 @@ export default class AlienTeleportTs
     }
     async  transportChanged(model: TableModel<TransportModel>)
     {
-         
-        console.log(model.data.quantity);
         try{
             if(model.data.quantity.split(' ')[1]!=config.symbol)return;
             
@@ -117,9 +115,13 @@ export default class AlienTeleportTs
             console.log('>>>>>>',config.hyperionUrl+'/v1/history/get_transaction');
             console.log('>>>>>>',{id:transaction.trx.id});
             
-            let trx:any=  await WebService.post(config.hyperionUrl+'/v1/history/get_transaction',{id:transaction.trx.id},null,null)
-            log=trx.traces.filter(p=>p.act.name=='logteleport' && p.act.account==config.contract)[0]
-            if(log) break
+            if(transaction.trx.id)
+            {
+                let trx:any=  await WebService.post(config.hyperionUrl+'/v1/history/get_transaction',{id:transaction.trx.id},null,null)
+                log=trx.traces.filter(p=>p.act.name=='logteleport' && p.act.account==config.contract)[0]
+                if(log) break
+
+            }
         }
         const sb = new Serialize.SerialBuffer({
             textEncoder: new TextEncoder,
