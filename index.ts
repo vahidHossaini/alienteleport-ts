@@ -39,11 +39,11 @@ export default class AlienTeleportTs
     {
         console.log(data.data);
         let dt=data.data
+        let actions=[]
         try{ 
             let precision= config.precision
             const amount = (parseInt(dt.tokens)  / Math.pow(10, precision)).toFixed(precision);
-            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
-               actions:[
+            actions=[
                    new EosAction({
                        account: config.contract,
                        name: 'received',
@@ -61,12 +61,19 @@ export default class AlienTeleportTs
                        }
                    })
                ]
+            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+               actions
             }))
             StorageService.Save('evmteleport',data.blockNumber)
           console.log('evm->',data.transactionHash,dt.tokens); 
         }catch(exp){  
-           console.log(exp.message.indexOf('Oracle has already signed'));
+           //console.log(exp.message.indexOf('Oracle has already signed'));
+           console.log('-------------------------'); 
+           console.log('teleportChanged'); 
            console.log(exp.message); 
+           console.log(JSON.stringify(actions,null,4) );
+           console.log('-------------------------'); 
+           
         }
 
     }
@@ -74,10 +81,10 @@ export default class AlienTeleportTs
     {
         console.log(data.data);
         let dt=data.data
+        let actions =[];
         try{ 
             let precision=config.precision
-            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
-               actions:[
+            actions=[
                    new EosAction({
                        account: config.contract,
                        name: 'claimed',
@@ -93,12 +100,17 @@ export default class AlienTeleportTs
                        }
                    })
                ]
+            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+               actions
             }))
             StorageService.Save('evm',data.blockNumber)
           console.log('evm->',dt.id,dt.tokens); 
         }catch(exp){  
-           console.log(exp.message.indexOf('Oracle has already signed'));
-           console.log(exp.message); 
+            console.log('-------------------------'); 
+            console.log('climedChanged'); 
+            console.log(exp.message); 
+            console.log(JSON.stringify(actions,null,4) );
+            console.log('-------------------------'); 
         }
     }
     async  transportChanged(model: TableModel<TransportModel>)
@@ -107,6 +119,7 @@ export default class AlienTeleportTs
             if(model.data.quantity.split(' ')[1]!=config.symbol)return;
             
         }catch(exp){}
+        let actions =[];
         let block:any= await WebService.post(config.hyperionUrl+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
         console.log(block.transactions);
         let log:any={};
@@ -160,8 +173,7 @@ export default class AlienTeleportTs
         
 
          try{ 
-             await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
-                actions:[
+            actions=[
                     new EosAction({
                         account: config.contract,//brdgaa.dstny
                         name: 'sign',
@@ -176,6 +188,8 @@ export default class AlienTeleportTs
                         }
                     })
                 ]
+             await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+                actions
              }))
              StorageService.Save('teleportTable',model.timestamp)
            console.log(signature); 
@@ -185,8 +199,11 @@ export default class AlienTeleportTs
                 StorageService.Save('teleportTable',model.timestamp)
                 
             }
-            console.log(exp.message.indexOf('Oracle has already signed'));
+            console.log('-------------------------'); 
+            console.log('transportChanged'); 
             console.log(exp.message); 
+            console.log(JSON.stringify(actions,null,4) );
+            console.log('-------------------------'); 
          }
     }
 }
