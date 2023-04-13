@@ -76,7 +76,7 @@ export default class AlienTeleportTs
         let dt=data.data
         try{ 
             let precision=Number(process.env.PRECISION)
-            await ActionController.run(config.hyperionUrl,process.env.NTV_PK,new TransactionModel({
+            await ActionController.run(process.env.HYPERION,process.env.NTV_PK,new TransactionModel({
                actions:[
                    new EosAction({
                        account: process.env.BRIDGE,
@@ -107,18 +107,18 @@ export default class AlienTeleportTs
             if(model.data.quantity.split(' ')[1]!=process.env.TKN_SYMB)return;
             
         }catch(exp){}
-        let block:any= await WebService.post(config.hyperionUrl+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
+        let block:any= await WebService.post(process.env.HYPERION+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
         console.log(block.transactions);
         let log:any={};
         for(let transaction of block.transactions)
         {
-            console.log('>>>>>>',config.hyperionUrl+'/v1/history/get_transaction');
+            console.log('>>>>>>',process.env.HYPERION+'/v1/history/get_transaction');
             console.log('>>>>>>',{id:transaction.trx.id});
             
             if(transaction.trx.id)
             {
-                let trx:any=  await WebService.post(config.hyperionUrl+'/v1/history/get_transaction',{id:transaction.trx.id},null,null)
-                log=trx.traces.filter(p=>p.act.name=='logteleport' && p.act.account==config.contract)[0]
+                let trx:any=  await WebService.post(process.env.HYPERION+'/v1/history/get_transaction',{id:transaction.trx.id},null,null)
+                log=trx.traces.filter(p=>p.act.name=='logteleport' && p.act.account==process.env.NTV_ACCNT)[0]
                 if(log) break
 
             }
@@ -144,7 +144,7 @@ export default class AlienTeleportTs
          const signature = toRpcSig (sig.v, sig.r, sig.s)// ethUtil.toRpcSig(sig.v, sig.r, sig.s); 
         console.log(signature);
         
-        let tb=await ApiController.getTable(config.hyperionUrl,new ApiRequest({
+        let tb=await ApiController.getTable(process.env.HYPERION,new ApiRequest({
             code:process.env.BRIDGE,
             scope:process.env.BRIDGE,
             table:'teleports',
@@ -160,7 +160,7 @@ export default class AlienTeleportTs
         
 
          try{ 
-             await ActionController.run(config.hyperionUrl,process.env.NTV_PK,new TransactionModel({
+             await ActionController.run(process.env.HYPERION,process.env.NTV_PK,new TransactionModel({
                 actions:[
                     new EosAction({
                         account: process.env.BRIDGE,//brdgaa.dstny
