@@ -6,9 +6,9 @@
   },
   "dependencies": {
     "@types/node": "^18.11.17",
-    "dotenv": "^16.0.3", 
+    "dotenv": "^16.0.3",
     "tsoribase": "^0.1.4",
-    "tsorihyperion": "^0.3.22", 
+    "tsorihyperion": "^0.3.25",
     "typescript": "^4.7.3"
   }
 }

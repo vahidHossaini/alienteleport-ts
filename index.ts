@@ -27,12 +27,12 @@ export default class AlienTeleportTs
         var hp = new HyperionRouter(config.hyperionUrl);
 
         hp.addTable(new HpTable({code:config.contract,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}),
-        TransportModel,this.transportChanged);
+        TransportModel,this.transportChanged,this);
         hp.statrtHttp('producers.',5000)
 
         let evm= new EvmRouter(config.EVMUrl,config.EVMSSocketUrl,abi,config.EVMContract)
-        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.climedChanged)
-        evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged) 
+        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.climedChanged,this)
+        evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged,this) 
 
     }
     async teleportChanged(data:EventModel<TeleportModel>)
