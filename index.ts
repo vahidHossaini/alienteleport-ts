@@ -45,6 +45,7 @@ export default class AlienTeleportTs
     {
         console.log(data.data);
         let dt=data.data
+        let actions=[]
         try{ 
             let precision= Number(process.env.PRECISION)
             const amount = (parseInt(dt.tokens)  / Math.pow(10, precision)).toFixed(precision);
@@ -71,8 +72,11 @@ export default class AlienTeleportTs
             StorageService.Save('evmteleport',data.blockNumber)
           console.log('evm->',data.transactionHash,dt.tokens); 
         }catch(exp){  
-           console.log(exp.message.indexOf('Oracle has already signed'));
+           console.log('-------------------------'); 
+           console.log('teleportChanged'); 
            console.log(exp.message); 
+           console.log(JSON.stringify(actions,null,4) );
+           console.log('-------------------------'); 
         }
 
     }
@@ -80,6 +84,7 @@ export default class AlienTeleportTs
     {
         console.log(data.data);
         let dt=data.data
+        let actions=[]
         try{ 
             let precision=Number(process.env.PRECISION)
             await ActionController.run(process.env.HYPERION,process.env.NTV_PK,new TransactionModel({
@@ -103,8 +108,11 @@ export default class AlienTeleportTs
             StorageService.Save('evm',data.blockNumber)
           console.log('evm->',dt.id,dt.tokens); 
         }catch(exp){  
-           console.log(exp.message.indexOf('Oracle has already signed'));
-           console.log(exp.message); 
+           console.log('-------------------------'); 
+            console.log('claimedChanged'); 
+            console.log(exp.message); 
+            console.log(JSON.stringify(actions,null,4) );
+            console.log('-------------------------'); 
         }
     }
     async  transportChanged(model: TableModel<TransportModel>)
@@ -113,6 +121,7 @@ export default class AlienTeleportTs
             if(model.data.quantity.split(' ')[1]!=process.env.TKN_SYMB)return;
             
         }catch(exp){}
+        let actions=[]
         let block:any= await WebService.post(process.env.HYPERION+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
         console.log(block.transactions);
         let log:any={};
@@ -191,8 +200,11 @@ export default class AlienTeleportTs
                 StorageService.Save('teleportTable',model.timestamp)
                 
             }
-            console.log(exp.message.indexOf('Oracle has already signed'));
+            console.log('-------------------------'); 
+            console.log('transportChanged'); 
             console.log(exp.message); 
+            console.log(JSON.stringify(actions,null,4) );
+            console.log('-------------------------'); 
          }
     }
 }
