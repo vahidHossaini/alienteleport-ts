@@ -27,7 +27,7 @@ export default class AlienTeleportTs
         var hp = new HyperionRouter(process.env.HYPERION);
 
         hp.addTable(new HpTable({code:process.env.BRIDGE,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}),
-        TransportModel,this.transportChanged, this;
+        TransportModel,this.transportChanged, this);
         hp.statrtHttp('producers.',5000)
 
         let evm= new EvmRouter(process.env.EVM_URL,process.env.EVM_SOCKET,abi,process.env.NTV_CA)
