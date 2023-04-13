@@ -48,15 +48,15 @@ export default class AlienTeleportTs
                        account: config.contract,
                        name: 'received',
                        authorization:[{
-                           actor: config.contract,
+                           actor: config.oracleAccount,
                            permission:  'active'
                        }],
                        data:{
-                            oracle_name: config.contract,
+                            oracle_name: config.oracleAccount,
                             to:dt.to,
                             ref: data.transactionHash.replace(/^0x/, ''),
                             quantity: `${amount} ${config.symbol}`,
-                            chain_id:dt.chainId,
+                            chain_id:config.chainId,
                             confirmed: true
                        }
                    })
@@ -82,11 +82,11 @@ export default class AlienTeleportTs
                        account: config.contract,
                        name: 'claimed',
                        authorization:[{
-                           actor: config.contract,
+                           actor: config.oracleAccount,
                            permission:  'active'
                        }],
                        data:{
-                           oracle_name: config.contract,
+                           oracle_name: config.oracleAccount,
                            id:dt.id,
                            to_eth:dt.to.replace('0x', '') + '000000000000000000000000',
                            quantity:(parseInt(dt.tokens)   / Math.pow(10, precision)).toFixed(precision) + ' ' + config.symbol
@@ -163,14 +163,14 @@ export default class AlienTeleportTs
              await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
                 actions:[
                     new EosAction({
-                        account: config.contract,
+                        account: config.contract,//brdgaa.dstny
                         name: 'sign',
                         authorization:[{
-                            actor: config.contract,
+                            actor: config.oracleAccount,//oracle.dstny
                             permission:  'active'
                         }],
                         data:{
-                            oracle_name: config.contract,
+                            oracle_name: config.oracleAccount,//oracle.dstny
                             id: model.data.id,
                             signature
                         }

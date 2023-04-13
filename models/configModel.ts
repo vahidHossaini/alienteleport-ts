@@ -10,6 +10,7 @@ export default class ConfigModel
     precision:number;
     EVMContract:string;
     EVMContractPrivateKey:string;
+    chainId:string;
     constructor(data:{
         contract:string;
         hyperionUrl:string;
@@ -21,6 +22,7 @@ export default class ConfigModel
         precision:number;
         EVMContract:string;
         EVMContractPrivateKey:string;
+        chainId:string;
     })
     {
         Object.assign(this,data);
