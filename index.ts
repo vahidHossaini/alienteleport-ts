@@ -6,7 +6,7 @@ import config from './config';
 import {Serialize} from 'eosjs'
 const ethUtil = require('ethereumjs-util');
 import { keccak ,toRpcSig} from 'ethereumjs-util'
-import ClaimedModel from './models/clamedModel'; 
+import ClaimedModel from './models/claimedModel'; 
 import TeleportModel from './models/teleportModel';
 import TransportModel from './models/transportModel';
 import StorageService from './storageService';
