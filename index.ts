@@ -26,13 +26,13 @@ export default class AlienTeleportTs
         var time= await StorageService.Get();
         var hp = new HyperionRouter(process.env.HYPERION);
 
-        hp.addTable(new HpTable({code:process.env.BRIDGE,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}),
+        hp.addTable(new HpTable({code:process.env.BRIDGE,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}, this),
         TransportModel,this.transportChanged);
         hp.statrtHttp('producers.',5000)
 
         let evm= new EvmRouter(process.env.EVM_URL,process.env.EVM_SOCKET,abi,process.env.NTV_CA)
-        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.claimedChanged)
-        evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged) 
+        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.claimedChanged, this)
+        evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged, this) 
 
     }
     async teleportChanged(data:EventModel<TeleportModel>)
@@ -40,7 +40,7 @@ export default class AlienTeleportTs
         console.log(data.data);
         let dt=data.data
         try{ 
-            let precision= process.env.PRECISION
+            let precision= Number(process.env.PRECISION)
             const amount = (parseInt(dt.tokens)  / Math.pow(10, precision)).toFixed(precision);
             await ActionController.run(process.env.HYPERION,process.env.NTV_PK,new TransactionModel({
                actions:[
@@ -75,7 +75,7 @@ export default class AlienTeleportTs
         console.log(data.data);
         let dt=data.data
         try{ 
-            let precision=process.env.PRECISION
+            let precision=Number(process.env.PRECISION)
             await ActionController.run(config.hyperionUrl,process.env.NTV_PK,new TransactionModel({
                actions:[
                    new EosAction({
