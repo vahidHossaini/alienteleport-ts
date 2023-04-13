@@ -146,7 +146,7 @@ export default class AlienTeleportTs
         
         let tb=await ApiController.getTable(config.hyperionUrl,new ApiRequest({
             code:process.env.BRIDGE,
-            scope:process.env.BRIDGE
+            scope:process.env.BRIDGE,
             table:'teleports',
             lower_bound:model.data.id.toString(),
             upper_bound:model.data.id.toString()
