@@ -26,7 +26,7 @@ export default class AlienTeleportTs
     {  
         const PORT = process.env.PORT || 5001;
 
-        app = express();
+        const app = express();
         app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
         
         var time= await StorageService.Get();
