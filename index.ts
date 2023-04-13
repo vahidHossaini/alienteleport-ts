@@ -1,4 +1,4 @@
-require('dotenv').config() 
+//require('dotenv').config() 
 import { WebService } from 'tsoribase';
 import { ActionController, ApiController, ApiRequest, EosAction, EventModel, EvmRouter, HpTable, HyperionRouter, TableModel, TransactionModel } from 'tsorihyperion';
 import abi from './abi';
@@ -24,14 +24,14 @@ export default class AlienTeleportTs
     async init()
     {  
         var time= await StorageService.Get();
-        var hp = new HyperionRouter(config.hyperionUrl);
+        var hp = new HyperionRouter(process.env.HYPERION);
 
-        hp.addTable(new HpTable({code:config.contract,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}),
+        hp.addTable(new HpTable({code:process.env.BRIDGE,table:'teleports',start_from:time.teleportTable??StorageService.defaultTime}),
         TransportModel,this.transportChanged);
         hp.statrtHttp('producers.',5000)
 
-        let evm= new EvmRouter(config.EVMUrl,config.EVMSSocketUrl,abi,config.EVMContract)
-        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.climedChanged)
+        let evm= new EvmRouter(process.env.EVM_URL,process.env.EVM_SOCKET,abi,process.env.NTV_CA)
+        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.claimedChanged)
         evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged) 
 
     }
@@ -40,23 +40,23 @@ export default class AlienTeleportTs
         console.log(data.data);
         let dt=data.data
         try{ 
-            let precision= config.precision
+            let precision= process.env.PRECISION
             const amount = (parseInt(dt.tokens)  / Math.pow(10, precision)).toFixed(precision);
-            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+            await ActionController.run(process.env.HYPERION,process.env.NTV_PK,new TransactionModel({
                actions:[
                    new EosAction({
-                       account: config.contract,
+                       account: process.env.BRIDGE,
                        name: 'received',
                        authorization:[{
-                           actor: config.oracleAccount,
+                           actor: process.env.NTV_ACCNT,
                            permission:  'active'
                        }],
                        data:{
-                            oracle_name: config.oracleAccount,
+                            oracle_name: process.env.NTV_ACCNT,
                             to:dt.to,
                             ref: data.transactionHash.replace(/^0x/, ''),
-                            quantity: `${amount} ${config.symbol}`,
-                            chain_id:config.chainId,
+                            quantity: `${amount} ${process.env.TKN_SYMB}`,
+                            chain_id:process.env.CHAINID,
                             confirmed: true
                        }
                    })
@@ -70,26 +70,26 @@ export default class AlienTeleportTs
         }
 
     }
-    async climedChanged(data:EventModel<ClaimedModel>)
+    async claimedChanged(data:EventModel<ClaimedModel>)
     {
         console.log(data.data);
         let dt=data.data
         try{ 
-            let precision=config.precision
-            await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+            let precision=process.env.PRECISION
+            await ActionController.run(config.hyperionUrl,process.env.NTV_PK,new TransactionModel({
                actions:[
                    new EosAction({
-                       account: config.contract,
+                       account: process.env.BRIDGE,
                        name: 'claimed',
                        authorization:[{
-                           actor: config.oracleAccount,
+                           actor: process.env.NTV_ACCNT,
                            permission:  'active'
                        }],
                        data:{
-                           oracle_name: config.oracleAccount,
+                           oracle_name: process.env.NTV_ACCNT,
                            id:dt.id,
                            to_eth:dt.to.replace('0x', '') + '000000000000000000000000',
-                           quantity:(parseInt(dt.tokens)   / Math.pow(10, precision)).toFixed(precision) + ' ' + config.symbol
+                           quantity:(parseInt(dt.tokens)   / Math.pow(10, precision)).toFixed(precision) + ' ' + process.env.TKN_SYMB
                        }
                    })
                ]
@@ -104,7 +104,7 @@ export default class AlienTeleportTs
     async  transportChanged(model: TableModel<TransportModel>)
     {
         try{
-            if(model.data.quantity.split(' ')[1]!=config.symbol)return;
+            if(model.data.quantity.split(' ')[1]!=process.env.TKN_SYMB)return;
             
         }catch(exp){}
         let block:any= await WebService.post(config.hyperionUrl+'/v1/chain/get_block',{block_num_or_id:model.block_num},null,null)  
@@ -139,38 +139,38 @@ export default class AlienTeleportTs
         console.log(data_serialized);
          //const data_buf = Buffer.from(data_serialized);
          const msg_hash = keccak(data_serialized)// ethUtil.keccak(data_buf);
-         const pk = Buffer.from(config.EVMContractPrivateKey, "hex");
+         const pk = Buffer.from(process.env.EVM_PK, "hex");
          const sig = ethUtil.ecsign(msg_hash, pk);
          const signature = toRpcSig (sig.v, sig.r, sig.s)// ethUtil.toRpcSig(sig.v, sig.r, sig.s); 
         console.log(signature);
         
         let tb=await ApiController.getTable(config.hyperionUrl,new ApiRequest({
-            code:config.contract,
-            scope:config.contract,
+            code:process.env.BRIDGE,
+            scope:process.env.BRIDGE
             table:'teleports',
             lower_bound:model.data.id.toString(),
             upper_bound:model.data.id.toString()
          }),TransportModel)
          if( tb.rows.length)
          {
-            if(tb.rows[0].oracles.indexOf(config.contract)>-1)return
+            if(tb.rows[0].oracles.indexOf(process.env.BRIDGE)>-1)return
             //return;
          }
         // const action_deser = await eos_api.deserializeActions([log.act]);
         
 
          try{ 
-             await ActionController.run(config.hyperionUrl,config.oraclePrivateKey,new TransactionModel({
+             await ActionController.run(config.hyperionUrl,process.env.NTV_PK,new TransactionModel({
                 actions:[
                     new EosAction({
-                        account: config.contract,//brdgaa.dstny
+                        account: process.env.BRIDGE,//brdgaa.dstny
                         name: 'sign',
                         authorization:[{
-                            actor: config.oracleAccount,//oracle.dstny
+                            actor: process.env.NTV_ACCNT,//oracle.dstny
                             permission:  'active'
                         }],
                         data:{
-                            oracle_name: config.oracleAccount,//oracle.dstny
+                            oracle_name: process.env.NTV_ACCNT,//oracle.dstny
                             id: model.data.id,
                             signature
                         }
