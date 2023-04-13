@@ -37,7 +37,7 @@ export default class AlienTeleportTs
         hp.statrtHttp('producers.',5000)
 
         let evm= new EvmRouter(process.env.EVM_URL,process.env.EVM_SOCKET,abi,process.env.NTV_CA)
-        evm.readEvent(true,'Claimed',time.evm,ClaimedModel,this.claimedChanged, this)
+        evm.readEvent(false,'Claimed',time.evm,ClaimedModel,this.claimedChanged, this)
         evm.readEvent(false,'Teleport',time.evmteleport,TeleportModel,this.teleportChanged, this) 
 
     }
