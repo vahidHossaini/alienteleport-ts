@@ -5,6 +5,7 @@ import abi from './abi';
 import config from './config'; 
 import {Serialize} from 'eosjs'
 const ethUtil = require('ethereumjs-util');
+const express = require('express');
 import { keccak ,toRpcSig} from 'ethereumjs-util'
 import ClaimedModel from './models/claimedModel'; 
 import TeleportModel from './models/teleportModel';
@@ -25,6 +26,7 @@ export default class AlienTeleportTs
     {  
         const PORT = process.env.PORT || 5001;
 
+        app = express();
         app.listen(PORT, () => console.log(`Server is listening on port ${PORT}...`));
         
         var time= await StorageService.Get();
