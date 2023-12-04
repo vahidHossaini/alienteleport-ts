@@ -12,7 +12,7 @@ export default class StorageService
             time=new StorageModel(JSON.parse(fs.readFileSync('time.txt')+'')) 
        }
        // Returing time from Process Environment using format 2018-07-08T00:00:00.000Z
-       return StorageModel(JSON.parse(process.env.DFLT_TIME+'');
+       return StorageModel(JSON.parse(process.env.DFLT_TIME+''));
     }
     static async Save(name:string,value:any)
     { 
